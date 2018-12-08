@@ -1,0 +1,6 @@
+project Extract
+is
+   for Source_Dirs use ("src");
+   for Create_Missing_Dirs use "True";
+
+end Extract;
