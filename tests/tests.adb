@@ -23,9 +23,9 @@ is
    procedure Check (Message  : String;
                     Data     : Byte_Array;
                     Offset   : Natural;
-                    Expected : U13)
+                    Expected : Value_Type)
    is
-      Result : U13;
+      Result : Value_Type;
    begin
       Result := Extract.Extract (Data, Offset);
       Assert (Result = Expected, Message, "expected " & Expected'Img & ", got " & Result'Img);

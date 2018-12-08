@@ -1,4 +1,6 @@
 package body Extract
+with
+   SPARK_Mode
 is
 
    -------------
@@ -7,9 +9,9 @@ is
 
    function Extract
      (Data   : Byte_Array;
-      Offset : Natural) return U13
+      Offset : Natural) return Value_Type
    is
-      Result : U13 := 0;
+      Result : Value_Type := 0;
    begin
       return Result;
    end Extract;

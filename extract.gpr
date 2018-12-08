@@ -5,4 +5,9 @@ is
    for Main use ("tests.adb");
    for Create_Missing_Dirs use "True";
 
+   package Compiler
+   is
+      for Switches ("Ada") use ("-gnata");
+   end Compiler;
+
 end Extract;
