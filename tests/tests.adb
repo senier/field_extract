@@ -36,8 +36,9 @@ is
 begin
    Put_Line ("Running tests...");
 
-   Check ("Extract", Data, 0, 16#0dbe#);
-   Check ("Extract", Data, 1, 16#16df#);
-   Check ("Extract", Data, 2, 16#0b6f#);
-   Check ("Extract", Data, 7, 16#1d5b#);
+   Check ("Extract 3 bytes, Off 0", Data, 0, 16#0dbe#);
+   Check ("Extract 3 bytes, Off 1", Data, 1, 16#16df#);
+   Check ("Extract 3 bytes, Off 2", Data, 2, 16#0b6f#);
+   Check ("Extract 3 bytes, Off 3", Data, 3, 16#15b7#);
+   Check ("Extract 3 bytes, Off 7", Data, 7, 16#1d5b#);
 end Tests;
