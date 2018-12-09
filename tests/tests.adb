@@ -8,9 +8,6 @@ is
    use Ada.Text_IO;
    use Extract;
 
-   type U13 is mod 2**13;
-   function Extract_13 is new Extract.Extract (U13);
-
    procedure Assert (Condition : Boolean;
                      Message   : String;
                      Error     : String)

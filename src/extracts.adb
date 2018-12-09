@@ -1,4 +1,4 @@
-package body Extract
+package body Extracts
 with
    SPARK_Mode
 is
@@ -26,4 +26,4 @@ is
       return Result;
    end Extract;
 
-end Extract;
+end Extracts;
