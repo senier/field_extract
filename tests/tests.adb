@@ -2,9 +2,14 @@ with Ada.Text_IO;
 with Extract;
 
 procedure Tests
+with
+   SPARK_Mode
 is
    use Ada.Text_IO;
    use Extract;
+
+   type U13 is mod 2**13;
+   function Extract_13 is new Extract.Extract (U13);
 
    procedure Assert (Condition : Boolean;
                      Message   : String;
@@ -23,11 +28,11 @@ is
    procedure Check (Message  : String;
                     Data     : Byte_Array;
                     Offset   : Natural;
-                    Expected : Value_Type)
+                    Expected : U13)
    is
-      Result : Value_Type;
+      Result : U13;
    begin
-      Result := Extract.Extract (Data, Offset);
+      Result := Extract_13 (Data, Offset);
       Assert (Result = Expected, Message, "expected " & Expected'Img & ", got " & Result'Img);
    end Check;
 
