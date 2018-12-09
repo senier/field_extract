@@ -7,7 +7,7 @@ is
 
    package Compiler
    is
-      for Switches ("Ada") use ("-gnata");
+      for Switches ("Ada") use ("-gnata", "-gnato13");
    end Compiler;
 
 end Extract;

@@ -5,10 +5,12 @@ is
    type Value_Type is mod 2**13;
 
    type Byte is mod 2**8;
-   type Byte_Array is array (Natural range <>) of Byte;
+
+   subtype Index_Type is Natural range Natural'First .. Natural'Last - 1;
+   type Byte_Array is array (Index_Type range <>) of Byte;
 
    function Extract (Data   : Byte_Array;
                      Offset : Natural) return Value_Type
    with
-      Pre => Offset < 8;
+      Pre => Data'Length > (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size - 1 and Offset < 8;
 end Extract;
