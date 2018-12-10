@@ -12,6 +12,6 @@ is
    function Extract (Data   : Byte_Array;
                      Offset : Natural) return Value_Type
    with
-      Pre => Data'Length > (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size - 1 and Offset < 8;
+      Pre => Data'Length >= (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size and Offset < 8;
 
 end Extracts;
