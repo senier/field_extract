@@ -19,9 +19,11 @@ is
       for I in Natural range 0 .. Last
       loop
          Next := (if I < Last
-                  then Value_Type (Data (Data'Last - I - 1) and (2**Offset - 1)) * 2**(8 - Offset)
+                  then Value_Type (Data (Data'Last - I - 1) and (2**Offset - 1)) * 2**(Byte'Size - Offset)
                   else 0);
-         Result := Result + 256**I * (Value_Type (Data (Data'Last - I) / 2**Offset) + Next);
+         Result := Result
+           + 2**(Byte'Size * I)
+             * (Value_Type (Data (Data'Last - I) / 2**Offset and (2**Value_Type'Size - 1)) + Next);
       end loop;
       return Result;
    end Extract;
