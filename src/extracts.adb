@@ -19,7 +19,7 @@ is
       for I in Natural range 0 .. Last
       loop
          Next := (if I < Last
-                  then Value_Type (Data (Data'Last - I - 1) and (2**Offset - 1)) * 2**(Byte'Size - Offset)
+                  then Value_Type (Data (Data'Last - I - 1) and (2**Offset - 1) and (2**Value_Type'Size - 1)) * 2**(Byte'Size - Offset)
                   else 0);
          Result := Result
            + 2**(Byte'Size * I)
