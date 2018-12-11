@@ -61,6 +61,17 @@ is
       Assert (Result = Expected, Message, "expected " & Expected'Img & ", got " & Result'Img);
    end Check_7;
 
+   procedure Check_1 (Message  : String;
+                      Data     : Byte_Array;
+                      Offset   : Natural;
+                      Expected : U1)
+   is
+      Result : U1;
+   begin
+      Result := Extract_1 (Data, Offset);
+      Assert (Result = Expected, Message, "expected " & Expected'Img & ", got " & Result'Img);
+   end Check_1;
+
    Data   : Byte_Array (1..3) := (16#de#, 16#ad#, 16#be#);
    Data64 : Byte_Array (1..8) := (16#de#, 16#ad#, 16#be#, 16#ef#, 16#ca#, 16#fe#, 16#ba#, 16#be#);
 
@@ -81,5 +92,16 @@ begin
    Check_57 ("Extract U57, 8 bytes, Off 0", Data64, 0, 16#adbeefcafebabe#);
    Check_57 ("Extract U57, 8 bytes, Off 3", Data64, 3, 16#1d5b7ddf95fd757#);
    Check_57 ("Extract U57, 8 bytes, Off 7", Data64, 7, 16#1bd5b7ddf95fd75#);
+
+   Check_1 ("Extract U1, 3 bytes, Off 17", Data, 24, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 17", Data, 17, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 16", Data, 16, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 15", Data, 15, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 14", Data, 14, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 13", Data, 13, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 12", Data, 12, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 11", Data, 11, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 1", Data, 0, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 0", Data, 0, 0);
 
 end Tests;
