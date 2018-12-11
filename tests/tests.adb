@@ -77,12 +77,10 @@ is
                       Offset   : Natural;
                       Expected : U1)
    is
-      pragma Unreferenced (Data, Offset, Expected);
-      --  Result : U1;
+      Result : U1;
    begin
-      Put_Line ("Omitted: " & Message);
-      --  Result := Extract_1 (Data, Offset);
-      --  Assert (Result = Expected, Message, "expected " & Expected'Img & ", got " & Result'Img);
+      Result := Extract_1 (Data, Offset);
+      Assert (Result = Expected, Message, "expected " & Expected'Img & ", got " & Result'Img);
    end Check_1;
 
    Data   : Byte_Array (1..3) := (16#de#, 16#ad#, 16#be#);
@@ -114,15 +112,15 @@ begin
    Check_2 ("Extract U2, 3 bytes, Off  1", Data (3..3), 1, 3);
    Check_2 ("Extract U2, 3 bytes, Off  0", Data (3..3), 0, 2);
 
-   Check_1 ("Extract U1, 3 bytes, Off 17", Data, 24, 1);
-   Check_1 ("Extract U1, 3 bytes, Off 17", Data, 17, 0);
-   Check_1 ("Extract U1, 3 bytes, Off 16", Data, 16, 1);
-   Check_1 ("Extract U1, 3 bytes, Off 15", Data, 15, 0);
-   Check_1 ("Extract U1, 3 bytes, Off 14", Data, 14, 1);
-   Check_1 ("Extract U1, 3 bytes, Off 13", Data, 13, 0);
-   Check_1 ("Extract U1, 3 bytes, Off 12", Data, 12, 1);
-   Check_1 ("Extract U1, 3 bytes, Off 11", Data, 11, 1);
-   Check_1 ("Extract U1, 3 bytes, Off 1", Data, 0, 1);
-   Check_1 ("Extract U1, 3 bytes, Off 0", Data, 0, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 23", Data (3..3), 7, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 17", Data (3..3), 1, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 16", Data (3..3), 0, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 15", Data (2..2), 7, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 14", Data (2..2), 6, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 13", Data (2..2), 5, 1);
+   Check_1 ("Extract U1, 3 bytes, Off 12", Data (2..2), 4, 0);
+   Check_1 ("Extract U1, 3 bytes, Off 11", Data (2..2), 3, 1);
+   Check_1 ("Extract U1, 3 bytes, Off  1", Data (1..1), 1, 1);
+   Check_1 ("Extract U1, 3 bytes, Off  0", Data (1..1), 0, 0);
 
 end Tests;

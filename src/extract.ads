@@ -16,6 +16,6 @@ is
    function Extract_13 is new Extracts.Extract (U13);
    function Extract_7 is new Extracts.Extract (U7);
    function Extract_2 is new Extracts.Extract (U2);
-   --  function Extract_1 is new Extracts.Extract (U1);
+   function Extract_1 is new Extracts.Extract (U1);
 
 end Extract;
