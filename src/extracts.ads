@@ -9,9 +9,16 @@ is
 
    generic
       type Value_Type is mod <>;
-   function Extract (Data   : Byte_Array;
-                     Offset : Natural) return Value_Type
+   function Extract_U (Data   : Byte_Array;
+                       Offset : Natural) return Value_Type
    with
-      Pre => Data'Length >= (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size and Offset < 8;
+      Pre => Offset < 8 and then Data'Length >= (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size;
+
+   generic
+      type Value_Type is range <>;
+   function Extract_I (Data   : Byte_Array;
+                       Offset : Natural) return Value_Type
+   with
+      Pre => Offset < 8 and then Data'Length >= (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size;
 
 end Extracts;
