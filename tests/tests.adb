@@ -139,6 +139,7 @@ is
    end Check_I1;
 
    Data   : Byte_Array (1..3) := (16#de#, 16#ad#, 16#be#);
+   Data2  : Byte_Array (1..2) := (16#ff#, 16#ff#);
    Data64 : Byte_Array (1..8) := (16#de#, 16#ad#, 16#be#, 16#ef#, 16#ca#, 16#fe#, 16#ba#, 16#be#);
 
 begin
@@ -166,6 +167,7 @@ begin
    Check_U2 ("Extract U2, 3 bytes, Off 18", Data (3..3), 1, 3);
    Check_U2 ("Extract U2, 3 bytes, Off  1", Data (3..3), 1, 3);
    Check_U2 ("Extract U2, 3 bytes, Off  0", Data (3..3), 0, 2);
+   Check_U2 ("Extract U2, 3 bytes, Off 16", Data2, 7, 3);
 
    Check_U1 ("Extract U1, 3 bytes, Off 23", Data (3..3), 7, 1);
    Check_U1 ("Extract U1, 3 bytes, Off 17", Data (3..3), 1, 1);
