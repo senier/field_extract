@@ -1,24 +1,17 @@
 package Extracts
-with
-   SPARK_Mode
+  with
+     SPARK_Mode
 is
-   type Byte is mod 2**8;
-
-   subtype Index_Type is Natural range Natural'First .. Natural'Last - 1;
-   type Byte_Array is array (Index_Type range <>) of Byte;
-
    generic
-      type Value_Type is mod <>;
-   function Extract_U (Data   : Byte_Array;
-                       Offset : Natural) return Value_Type
+      type Index_Type   is (<>);
+      type Element_Type is (<>);
+      type Array_Type   is array (Index_Type range <>) of Element_Type;
+      type Offset_Type  is (<>);
+      type Value_Type   is (<>);
+   function Extract (Data   : Array_Type;
+                     Offset : Offset_Type) return Value_Type
    with
-      Pre => Offset < 8 and then Data'Length >= (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size;
-
-   generic
-      type Value_Type is range <>;
-   function Extract_I (Data   : Byte_Array;
-                       Offset : Natural) return Value_Type
-   with
-      Pre => Offset < 8 and then Data'Length >= (Offset + Value_Type'Size + Byte'Size - 1) / Byte'Size;
+      Pre => Element_Type'Size < 63
+             and Data'Length > (Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size;
 
 end Extracts;
