@@ -9,9 +9,6 @@ is
       type Offset_Type  is (<>);
       type Value_Type   is (<>);
    function Extract (Data   : Array_Type;
-                     Offset : Offset_Type) return Value_Type
-   with
-      Pre => Element_Type'Size < 63
-             and Data'Length > (Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size;
+                     Offset : Offset_Type) return Value_Type;
 
 end Extracts;
