@@ -9,5 +9,9 @@ project Extract is
       for Switches ("ada") use ("-gnata", "-gnato13", "-g");
    end Compiler;
 
+   package Binder is
+      for Switches ("ada") use ("-Es");
+   end Binder;
+
 end Extract;
 

@@ -30,8 +30,12 @@ is
                     Expected : Expected_Type)
    with
       Pre => Message'Last < Natural'Last - 3
-             and Message'Length < 1000
-             and Data'Length > (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size;
+             and then Message'Length < 1000
+             and then Data'Length > (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size
+             and then (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size < Data'Length
+             and then (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size <= Natural'Size
+             and then ((Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size) * Byte'Size < Long_Integer'Size - 1
+             and then 2 ** (Byte'Size - Natural (Natural'Pos (Offset) mod Byte'Size)) <= Long_Integer'Last;
 
    procedure Check (Message  : String;
                     Data     : Byte_Array;
@@ -39,7 +43,11 @@ is
                     Expected : Expected_Type)
    is
       Result : Expected_Type;
-      function Extract is new Extracts.Extract (Index_Type, Byte, Byte_Array, Natural, Expected_Type);
+      function Extract is new Extracts.Extract (Index_Type   => Index_Type,
+                                                Element_Type => Byte,
+                                                Array_Type   => Byte_Array,
+                                                Offset_Type  => Natural,
+                                                Value_Type   => Expected_Type);
    begin
       Result := Extract (Data, Offset);
       Assert (Condition => Result = Expected,
@@ -59,7 +67,7 @@ is
    procedure Check_I1  is new Check (I1);
 
    Data   : Byte_Array (1..3) := (16#de#, 16#ad#, 16#be#);
-   Data2  : Byte_Array (1 .. 2) := (16#ff#, 16#ff#);
+   Data2  : Byte_Array (1..2) := (16#ff#, 16#ff#);
    Data64 : Byte_Array (1..8) := (16#de#, 16#ad#, 16#be#, 16#ef#, 16#ca#, 16#fe#, 16#ba#, 16#be#);
 
 begin
@@ -70,6 +78,7 @@ begin
    Check_U13 ("Extract U13, 3 bytes, Off 2", Data, 2, 16#0b6f#);
    Check_U13 ("Extract U13, 3 bytes, Off 3", Data, 3, 16#15b7#);
    Check_U13 ("Extract U13, 3 bytes, Off 7", Data, 7, 16#1d5b#);
+   Check_U13 ("Extract U13, 8 bytes, Off 11", Data64, 11, 16#1fd7#);
 
    Check_U7 ("Extract U7, 3 bytes, Off 0", Data, 0, 16#3e#);
    Check_U7 ("Extract U7, 3 bytes, Off 1", Data, 1, 16#5f#);
