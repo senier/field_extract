@@ -70,6 +70,7 @@ begin
    Check_U13 ("Extract U13, 3 bytes, Off 2", Data, 2, 16#0b6f#);
    Check_U13 ("Extract U13, 3 bytes, Off 3", Data, 3, 16#15b7#);
    Check_U13 ("Extract U13, 3 bytes, Off 7", Data, 7, 16#1d5b#);
+   Check_U13 ("Extract U13, 8 bytes, Off 11", Data64, 11, 16#1fd7#);
 
    Check_U7 ("Extract U7, 3 bytes, Off 0", Data, 0, 16#3e#);
    Check_U7 ("Extract U7, 3 bytes, Off 1", Data, 1, 16#5f#);
