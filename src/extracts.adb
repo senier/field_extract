@@ -49,6 +49,7 @@ is
       end D;
 
       Result : Long_Integer := 0;
+
    begin
       for I in Least_Significant_Index .. Most_Significant_Index - 1
       loop
@@ -62,13 +63,24 @@ is
                Current   : constant Long_Integer := Element_Type'Pos (D_Current) / 2 ** LSE_Offset;
                Next      : constant Long_Integer := Element_Type'Pos (D_Next) mod 2 ** LSE_Offset * 2 ** MSE_Offset;
             begin
-               Lemma_Base_Eq_Exp_Eq (2, Element_Type'Size, Element_Size);
                pragma Assert (2 ** Element_Type'Size = 2 ** Element_Size);
                Lemma_Div_Limit (Element_Type'Pos (D_Current), Element_Size, LSE_Offset);
                declare
                   Value : constant Long_Integer := Current + Next;
                begin
-                  Lemma_Mult_Ge_0 (Element_Type'Pos (D_Next) mod 2 ** LSE_Offset, 2 ** MSE_Offset);
+                  pragma Assert (Value < 2 ** Element_Type'Size);
+                  pragma Assert (Result < 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)));
+                  Lemma_Mult_Exp_Lt_Exp (Value, Element_Type'Size, Result, Element_Type'Size * Natural (I - Least_Significant_Index));
+
+                  pragma Assert (Value * 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) + Result
+                                 <= Long_Integer (2 ** (Element_Type'Size + Element_Type'Size * Natural (I - Least_Significant_Index))));
+
+                  pragma Assert (Value * 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) + Result
+                                 <= Long_Integer (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index + 1))));
+
+--                    pragma Assert (Element_Type'Size * Natural (I - Least_Significant_Index + 1) < Value_Type'Size - 1);
+--                    pragma Assert (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index + 1)) < 2 ** (Value_Type'Size - 1));
+
                   pragma Loop_Invariant (I + 1 < Data'Length);
                   pragma Loop_Invariant (2 ** Element_Size <= Long_Integer'Last);
                   pragma Loop_Invariant (Result >= Value_Type'Pos (Value_Type'First));
@@ -76,7 +88,7 @@ is
                   pragma Loop_Invariant (Result + 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) * Value
                                          <= Value_Type'Pos (Value_Type'Last));
                   Lemma_Mult_Ge_0 (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)), Value);
-                  Result := Result + (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) * Value);
+                  Result := Value * 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) + Result;
                end;
             end;
          end;
@@ -87,6 +99,7 @@ is
                      - 2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index))
                      * (Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset));
 
+      pragma Assert (2 ** LSE_Offset <= Natural'Last);
       Lemma_Mult_Ge_0 (2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index)),
                        Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset);
 
@@ -97,11 +110,13 @@ is
 
    procedure Lemma_Div_Limit (Value : Long_Integer;
                               I     : Natural;
-                              J     : Natural) with SPARK_Mode => Off
+                              J     : Natural)
    is
    begin
       pragma Assert (Value <= 2 ** I);
+      Lemma_Div_Mono (Value, 2 ** I, 2 ** J);
       pragma Assert (Value / 2 ** J <= 2 ** I / 2 ** J);
+      Lemma_Exp_Div (2, I, J);
       pragma Assert (2 ** I / 2 ** J = 2 ** (I - J));
    end Lemma_Div_Limit;
 
@@ -111,7 +126,13 @@ is
                                Exp_2   : Natural)
    is
    begin
-      null;
+      Lemma_Mult_Mono (Value_1, 2 ** Exp_1, Value_2);
+      pragma Assert (Value_1 * Value_2 <= 2 ** Exp_1 * Value_2);
+      Lemma_Mult_Mono (Value_2, 2 ** Exp_2, 2 ** Exp_1);
+      pragma Assert (2 ** Exp_1 * Value_2 <= 2 ** Exp_1 * 2 ** Exp_2);
+      Lemma_Exp_Mult (2, Exp_1, Exp_2);
+      pragma Assert (2 ** Exp_1 * 2 ** Exp_2 = 2 ** (Exp_1 + Exp_2));
+      pragma Assert (Value_1 * Value_2 <= 2 ** (Exp_1 + Exp_2));
    end Lemma_Mult_Limit;
 
    procedure Lemma_Exp_Mono (Base  : Long_Integer;
@@ -127,7 +148,12 @@ is
                                     Exp_2  : Natural)
    is
    begin
-      null;
+      Lemma_Exp_Mono (Base, Exp_1 + 1, Exp_2);
+      pragma Assert (Base ** (Exp_1 + 1) <= Base ** Exp_2);
+      pragma Assert (Base ** Exp_1 * Base <= Base ** Exp_2);
+      Lemma_Mult_Mono_Strict (1, Base, Base ** Exp_1);
+      pragma Assert (Base ** Exp_1 < Base ** Exp_1 * Base);
+      pragma Assert (Base ** Exp_1 < Base ** Exp_2);
    end Lemma_Exp_Mono_Strict;
 
    procedure Lemma_Mult_Ge_0 (Factor_1 : Long_Integer;
@@ -144,5 +170,73 @@ is
    begin
       null;
    end Lemma_Base_Eq_Exp_Eq;
+
+   procedure Lemma_Mult_Exp_Lt_Exp
+     (X : Long_Integer; J : Natural; Y : Long_Integer; K : Natural)
+   is
+   begin
+      pragma Assert (X * 2 ** K + Y < X * 2 ** K + 2 ** K);
+      pragma Assert (X * 2 ** K + 2 ** K = (X + 1) * 2 ** K);
+      pragma Assert (X + 1 <= 2 ** J);
+      Lemma_Mult_Mono (X + 1, 2 ** J, 2 ** K);
+      pragma Assert ((X + 1) * 2 ** K <= 2 ** J * 2 ** K);
+      pragma Assert (2 ** J * 2 ** K = 2 ** (J + K));
+      pragma Assert (X * 2 ** K + Y < 2 ** (J + K));
+   end Lemma_Mult_Exp_Lt_Exp;
+
+   procedure Lemma_Mult_Mono (X : Long_Integer;
+                              Y : Long_Integer;
+                              Z : Long_Integer)
+   is
+   begin
+      null;
+   end Lemma_Mult_Mono;
+
+   procedure Lemma_Mult_Mono_Strict (X : Long_Integer;
+                                     Y : Long_Integer;
+                                     Z : Long_Integer)
+   is
+   begin
+      null;
+   end Lemma_Mult_Mono_Strict;
+
+
+   procedure Lemma_Exp_Mult (Base  : Long_Integer;
+                             Exp_1 : Natural;
+                             Exp_2 : Natural)
+   is
+   begin
+     null;
+   end Lemma_Exp_Mult;
+
+   procedure Lemma_Exp_Div (Base  : Long_Integer;
+                            Exp_1 : Natural;
+                            Exp_2 : Natural)
+   is
+   begin
+      pragma Assert (Exp_1 = Exp_1 - Exp_2 + Exp_2);
+      pragma Assert (Base ** Exp_1 = Base ** (Exp_1 - Exp_2 + Exp_2));
+      Lemma_Exp_Mult (Base, Exp_1 - Exp_2, Exp_2);
+      pragma Assert (Base ** (Exp_1 - Exp_2 + Exp_2) = Base ** (Exp_1 - Exp_2) * Base ** Exp_2);
+      pragma Assert (Base ** Exp_1 = Base ** (Exp_1 - Exp_2) * Base ** Exp_2);
+      pragma Assert (Base ** Exp_1 / Base ** Exp_2 = Base ** (Exp_1 - Exp_2) * Base ** Exp_2 / Base ** Exp_2);
+      Lemma_Mult_Div_Id (Base ** (Exp_1 - Exp_2), Base ** Exp_2);
+      pragma Assert (Base ** (Exp_1 - Exp_2) * Base ** Exp_2 / Base ** Exp_2 = Base ** (Exp_1 - Exp_2));
+   end Lemma_Exp_Div;
+
+   procedure Lemma_Div_Mono (X : Long_Integer;
+                             Y : Long_Integer;
+                             Z : Long_Integer)
+   is
+   begin
+      null;
+   end Lemma_Div_Mono;
+
+   procedure Lemma_Mult_Div_Id (X : Long_Integer;
+                                Y : Long_Integer)
+   is
+   begin
+      null;
+   end Lemma_Mult_Div_Id;
 
 end Extracts;
