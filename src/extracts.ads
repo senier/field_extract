@@ -83,7 +83,7 @@ is
                                     Y : Long_Integer;
                                     K : Natural) with
      Pre  => 2 ** J < Natural'Last and 2 ** K < Natural'Last and X < 2 ** J and Y < 2 ** K,
-     Post => X * 2 ** K + Y <= 2 ** (J + K),
+     Post => X * 2 ** K + Y < 2 ** (J + K),
      Ghost;
 
    procedure Lemma_Exp_Mult (Base  : Long_Integer;

@@ -10,6 +10,7 @@ is
       pragma Assert ((Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size < Data'Length
                      and then (Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size <= Natural'Size
                      and then 2 ** Natural (((Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size) * Element_Type'Size) <= Long_Integer'Last);
+      pragma Assert (Element_Type'Pos (Element_Type'Last) = 2 ** Element_Type'Size - 1);
 
       --  Prevent the prover from simplifiying
       function Element_Size return Natural is (Element_Type'Size) with Post => Element_Size'Result = Element_Type'Size;
@@ -51,6 +52,9 @@ is
       Result : Long_Integer := 0;
 
    begin
+      pragma Assert (Most_Significant_Index - Least_Significant_Index
+                     = (LSB_Offset + Long_Integer (Value_Type'Size) - 1) / Element_Type'Size - LSB_Offset / Element_Type'Size);
+
       for I in Least_Significant_Index .. Most_Significant_Index - 1
       loop
          declare
@@ -68,26 +72,16 @@ is
                declare
                   Value : constant Long_Integer := Current + Next;
                begin
-                  pragma Assert (Value < 2 ** Element_Type'Size);
-                  pragma Assert (Result < 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)));
-                  Lemma_Mult_Exp_Lt_Exp (Value, Element_Type'Size, Result, Element_Type'Size * Natural (I - Least_Significant_Index));
-
-                  pragma Assert (Value * 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) + Result
-                                 <= Long_Integer (2 ** (Element_Type'Size + Element_Type'Size * Natural (I - Least_Significant_Index))));
-
-                  pragma Assert (Value * 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) + Result
-                                 <= Long_Integer (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index + 1))));
-
---                    pragma Assert (Element_Type'Size * Natural (I - Least_Significant_Index + 1) < Value_Type'Size - 1);
---                    pragma Assert (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index + 1)) < 2 ** (Value_Type'Size - 1));
-
-                  pragma Loop_Invariant (I + 1 < Data'Length);
-                  pragma Loop_Invariant (2 ** Element_Size <= Long_Integer'Last);
                   pragma Loop_Invariant (Result >= Value_Type'Pos (Value_Type'First));
                   pragma Loop_Invariant (Value >= 0);
-                  pragma Loop_Invariant (Result + 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) * Value
+                  pragma Loop_Invariant (Result
+                                         + 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index )) * Value
+                                         + 2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index)) *
+                                           (Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset)
                                          <= Value_Type'Pos (Value_Type'Last));
                   Lemma_Mult_Ge_0 (2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)), Value);
+                  Lemma_Mult_Ge_0 (2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index)),
+                                   Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset);
                   Result := Value * 2 ** (Element_Type'Size * Natural (I - Least_Significant_Index)) + Result;
                end;
             end;
@@ -95,10 +89,6 @@ is
       end loop;
 
       pragma Assert (Result >= Value_Type'Pos (Value_Type'First));
-      pragma Assert (Result <= Value_Type'Pos (Value_Type'Last)
-                     - 2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index))
-                     * (Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset));
-
       pragma Assert (2 ** LSE_Offset <= Natural'Last);
       Lemma_Mult_Ge_0 (2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index)),
                        Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset);
