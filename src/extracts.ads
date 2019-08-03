@@ -62,6 +62,13 @@ is
                               Z : Long_Integer) with
       Pre  => 0 <= Z and X <= Y,
       Post => Z * X <= Z * Y,
+     Ghost;
+
+   procedure Lemma_Mult_Mono2 (X : Long_Integer;
+                               Y : Long_Integer;
+                               Z : Long_Integer) with
+      Pre  => 0 < Z and 0 <= X and X <= Y,
+      Post => X <= Y * Z,
       Ghost;
 
    procedure Lemma_Div_Mono (X : Long_Integer;
@@ -107,5 +114,18 @@ is
      Pre  => 0 < Y,
      Post => X * Y / Y = X,
      Ghost;
+
+   procedure Lemma_Plus_Base_Le_Exp (B : Long_Integer;
+                                     E : Natural) with
+     Pre  => 1 < B and 1 < E and B ** E <= Long_Integer'Last,
+     Post => B ** (E - 1) + B <= B ** E,
+     Ghost;
+
+   procedure Lemma_Mult_Le_Cancel_Left1 (F1 : Long_Integer;
+                                         F2 : Long_Integer) with
+     Pre  => 0 <= F1 and 1 <= F2,
+     Post => F1 <= F1 * F2,
+     Ghost;
+
 
 end Extracts;
