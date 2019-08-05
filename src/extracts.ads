@@ -9,7 +9,11 @@ is
       type Offset_Type  is (<>);
       type Value_Type   is (<>);
    function Extract (Data   : Array_Type;
-                     Offset : Offset_Type) return Value_Type;
+                     Offset : Offset_Type) return Value_Type with
+     Pre => (Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size < Data'Length
+            and then (Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size <= Natural'Size
+            and then 2 ** Natural (((Offset_Type'Pos (Offset) + Value_Type'Size - 1) / Element_Type'Size) * Element_Type'Size) <= Long_Integer'Last;
+
 
    procedure Lemma_Div_Limit (Value : Long_Integer;
                               I     : Natural;
@@ -35,6 +39,13 @@ is
                              Exp_2  : Natural) with
       Pre  => 0 < Base and Exp_1 <= Exp_2,
       Post => Base ** Exp_1 <= Base ** Exp_2,
+      Ghost;
+
+   procedure Lemma_Exp_Eq (Base  : Long_Integer;
+                           Exp_1 : Natural;
+                           Exp_2  : Natural) with
+      Pre  => 0 < Base and Exp_1 = Exp_2,
+      Post => Base ** Exp_1 = Base ** Exp_2,
       Ghost;
 
    procedure Lemma_Exp_Mono_Strict (Base  : Long_Integer;

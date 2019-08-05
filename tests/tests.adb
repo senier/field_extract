@@ -30,8 +30,11 @@ is
                     Expected : Expected_Type)
    with
       Pre => Message'Last < Natural'Last - 3
-             and Message'Length < 1000
-             and Data'Length > (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size;
+             and then Message'Length < 1000
+             and then Data'Length > (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size
+             and then (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size < Data'Length
+             and then (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size <= Natural'Size
+             and then ((Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size) * Byte'Size < Long_Integer'Size;
 
    procedure Check (Message  : String;
                     Data     : Byte_Array;
@@ -39,8 +42,14 @@ is
                     Expected : Expected_Type)
    is
       Result : Expected_Type;
-      function Extract is new Extracts.Extract (Index_Type, Byte, Byte_Array, Natural, Expected_Type);
+      function Extract is new Extracts.Extract (Index_Type   => Index_Type,
+                                                Element_Type => Byte,
+                                                Array_Type   => Byte_Array,
+                                                Offset_Type  => Natural,
+                                                Value_Type   => Expected_Type);
    begin
+      pragma Assert (2 ** ((Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size) * Byte'Size
+                     <= Long_Integer'Last);
       Result := Extract (Data, Offset);
       Assert (Condition => Result = Expected,
               Message   => Message,
