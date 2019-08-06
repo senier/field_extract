@@ -10,12 +10,6 @@ is
       pragma Assert (Element_Type'Pos (Element_Type'First) = 0);
       pragma Assert (Element_Type'Pos (Element_Type'Last) = 2 ** Element_Type'Size - 1);
 
-      --  Prevent the prover from simplifiying
-      function Element_Size return Natural is (Element_Type'Size) with Post => Element_Size'Result = Element_Type'Size;
-
-      function Value_Size return Natural is (Value_Type'Size) with Post => Value_Size'Result = Value_Type'Size;
-      function Long_Integer_Size return Natural is (Long_Integer'Size) with Post => Long_Integer_Size'Result = Long_Integer'Size;
-
       LSB_Offset : constant Long_Integer := Offset_Type'Pos (Offset);
 
       --  Index pointing to least significant element
@@ -38,13 +32,12 @@ is
 
       function D (Index : Long_Integer) return Element_Type
       is
-         E : constant Natural := (LSE_Offset + Value_Type'Size + Element_Type'Size - 1) mod Element_Type'Size + 1;
+         function ES return Natural is (Element_Type'Size) with Post => ES'Result = Element_Type'Size;
+         E : constant Natural := (LSE_Offset + Value_Type'Size + Element_Type'Size - 1) mod ES + 1;
+         pragma Assert (2 ** Element_Type'Size = 2 ** ES);
       begin
-         pragma Assert (Element_Size = Element_Type'Size);
-         Lemma_Exp_Eq (2, Element_Type'Size, Element_Size);
-         pragma Assert (2 ** Element_Type'Size = 2 ** Element_Size);
          declare
-            Mask : constant Long_Integer := (if Index < Most_Significant_Index then 2 ** Element_Type'Size else 2 ** E);
+            Mask : constant Long_Integer := (if Index < Most_Significant_Index then 2 ** ES else 2 ** E);
             Val  : constant Element_Type := Data (Index_Type'Val ((Index_Type'Pos (Data'Last) - Index)));
          begin
             return Element_Type'Val (Element_Type'Pos (Val) mod Mask);
@@ -77,10 +70,9 @@ is
          end;
       end loop;
 
-      pragma Assert (Result_Type'(2 ** LSE_Offset) > 0);
       Result := Result + 2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index))
-        * (Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset);
-      return Value_Type'Val (Result mod 2 ** Value_Size);
+        * Result_Type (Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset);
+      return Value_Type'Val (Result mod 2 ** Value_Type'Size);
    end Extract;
 
    procedure Lemma_Div_Limit (Value : Long_Integer;

@@ -68,7 +68,7 @@ is
    procedure Check_I1  is new Check (I1);
 
    Data   : Byte_Array (1..3) := (16#de#, 16#ad#, 16#be#);
-   Data2  : Byte_Array (1 .. 2) := (16#ff#, 16#ff#);
+   Data2  : Byte_Array (1..2) := (16#ff#, 16#ff#);
    Data64 : Byte_Array (1..8) := (16#de#, 16#ad#, 16#be#, 16#ef#, 16#ca#, 16#fe#, 16#ba#, 16#be#);
 
 begin
