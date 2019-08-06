@@ -34,7 +34,8 @@ is
              and then Data'Length > (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size
              and then (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size < Data'Length
              and then (Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size <= Natural'Size
-             and then ((Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size) * Byte'Size < Long_Integer'Size;
+             and then ((Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size) * Byte'Size < Long_Integer'Size - 1
+             and then 2 ** (Byte'Size - Natural (Natural'Pos (Offset) mod Byte'Size)) <= Long_Integer'Last;
 
    procedure Check (Message  : String;
                     Data     : Byte_Array;
@@ -48,8 +49,6 @@ is
                                                 Offset_Type  => Natural,
                                                 Value_Type   => Expected_Type);
    begin
-      pragma Assert (2 ** ((Natural'Pos (Offset) + Expected_Type'Size - 1) / Byte'Size) * Byte'Size
-                     <= Long_Integer'Last);
       Result := Extract (Data, Offset);
       Assert (Condition => Result = Expected,
               Message   => Message,
