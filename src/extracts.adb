@@ -43,6 +43,8 @@ is
       type Result_Type is mod 2 ** Long_Integer'Size;
       Result : Result_Type := 0;
 
+      Pow2_LSE_Offset : constant Long_Integer := 2 ** LSE_Offset;
+
    begin
       pragma Assert (Value_Type'Size - Value_Type'Size mod Element_Type'Size
                      = Element_Type'Size * (Value_Type'Size / Element_Type'Size));
@@ -53,11 +55,11 @@ is
             D_Current : constant Element_Type := D (I);
             D_Next    : constant Element_Type := D (I + 1);
          begin
-            Lemmas.Mult_Limit (Element_Type'Pos (D_Next) mod 2 ** LSE_Offset, LSE_Offset, 2 ** MSE_Offset, MSE_Offset);
-            Lemmas.Mult_Ge_0 (Element_Type'Pos (D_Next) mod 2 ** LSE_Offset, 2 ** MSE_Offset);
+            Lemmas.Mult_Limit (Element_Type'Pos (D_Next) mod Pow2_LSE_Offset, LSE_Offset, 2 ** MSE_Offset, MSE_Offset);
+            Lemmas.Mult_Ge_0 (Element_Type'Pos (D_Next) mod Pow2_LSE_Offset, 2 ** MSE_Offset);
             declare
-               Current : constant Long_Integer := Element_Type'Pos (D_Current) / 2 ** LSE_Offset;
-               Next    : constant Long_Integer := Element_Type'Pos (D_Next) mod 2 ** LSE_Offset * 2 ** MSE_Offset;
+               Current : constant Long_Integer := Element_Type'Pos (D_Current) / Pow2_LSE_Offset;
+               Next    : constant Long_Integer := Element_Type'Pos (D_Next) mod Pow2_LSE_Offset * 2 ** MSE_Offset;
             begin
                Result := Result
                          + (Result_Type (Current) + Result_Type (Next))
@@ -67,7 +69,7 @@ is
       end loop;
 
       Result := Result + 2 ** (Element_Type'Size * Natural (Most_Significant_Index - Least_Significant_Index))
-        * Result_Type (Element_Type'Pos (D (Most_Significant_Index)) / 2 ** LSE_Offset);
+        * Result_Type (Element_Type'Pos (D (Most_Significant_Index)) / Pow2_LSE_Offset);
       return Value_Type'Val (Result mod 2 ** Value_Type'Size);
    end Extract;
 end Extracts;
