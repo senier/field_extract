@@ -72,7 +72,7 @@ is
       pragma Assert (X + 1 <= 2 ** J);
       Mult_Mono (X + 1, 2 ** J, 2 ** K);
       pragma Assert ((X + 1) * 2 ** K <= 2 ** J * 2 ** K);
-      pragma Assert (2 ** J * 2 ** K = 2 ** (J + K));
+      Exp_Mult (2, J, K);
       pragma Assert (X * 2 ** K + Y < 2 ** (J + K));
    end Mult_Exp_Lt_Exp;
 
